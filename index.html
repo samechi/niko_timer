@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>背景カスタムタイマー</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        /* 背景画像の設定 */
+        #bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* 画像ファイル*/
+            background-image: url('bg.png'); 
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+        }
+
+        .overlay {
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4); 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        /* 設定エリア */
+        .setup-area {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input[type="number"] {
+            width: 80px;
+            padding: 10px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            border: none;
+            text-align: center;
+        }
+
+        /* タイマー表示 */
+        #timer {
+            font-size: 10rem;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* ボタン */
+        button {
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 30px;
+            background: white;
+            color: #333;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            background: #eee;
+        }
+
+        button:disabled {
+            background: #888;
+            cursor: not-allowed;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="bg"></div>
+
+    <div class="overlay">
+        <div class="setup-area">
+            <input type="number" id="minutesInput" value="3" min="1" max="999">
+            <span>分に設定</span>
+            <button id="setBtn">セット</button>
+        </div>
+
+        <div id="timer">03:00</div>
+        
+        <div class="controls">
+            <button id="startStopBtn">スタート</button>
+            <button id="resetBtn">リセット</button>
+        </div>
+    </div>
+
+    <script>
+        let timeLeft = 180; 
+        let timerId = null;
+
+        const timerDisplay = document.getElementById('timer');
+        const minutesInput = document.getElementById('minutesInput');
+        const setBtn = document.getElementById('setBtn');
+        const startStopBtn = document.getElementById('startStopBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // 表示更新
+        function updateDisplay() {
+            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const s = (timeLeft % 60).toString().padStart(2, '0');
+            timerDisplay.textContent = `${m}:${s}`;
+        }
+
+        // 時間をセット
+        setBtn.addEventListener('click', () => {
+            const mins = parseInt(minutesInput.value);
+            if (mins > 0) {
+                timeLeft = mins * 60;
+                updateDisplay();
+                stopTimer();
+            }
+        });
+
+        // タイマー開始
+        function startTimer() {
+            if (timerId !== null) return;
+            timerId = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateDisplay();
+                } else {
+                    clearInterval(timerId);
+                    timerId = null;
+                    startStopBtn.textContent = 'スタート';
+                    alert('終了しました！');
+                }
+            }, 1000);
+            startStopBtn.textContent = 'ストップ';
+            setBtn.disabled = true;
+        }
+
+        // タイマー停止
+        function stopTimer() {
+            clearInterval(timerId);
+            timerId = null;
+            startStopBtn.textContent = 'スタート';
+            setBtn.disabled = false;
+        }
+
+        startStopBtn.addEventListener('click', () => {
+            if (timerId === null) startTimer();
+            else stopTimer();
+        });
+
+        resetBtn.addEventListener('click', () => {
+            stopTimer();
+            const mins = parseInt(minutesInput.value);
+            timeLeft = mins * 60;
+            updateDisplay();
+        });
+
+        updateDisplay();
+    </script>
+</body>
+</html>
