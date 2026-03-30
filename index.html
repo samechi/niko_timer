@@ -3,24 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>背景カスタムタイマー</title>
+    <title>にこのティータイムタイマー // NIKO_TEA_TIMER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Quicksand:wght@700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --niko-pink: #ffb5c5;
+            --niko-pink-light: #ffe6ea;
+            --niko-cream: #fffaf0;
+            --niko-gold: #f0e68c;
+            --niko-brown: #8b4513;
+            --font-main: 'Mochiy+Pop One', sans-serif;
+        }
+
         body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0; padding: 0;
+            height: 100%; overflow: hidden;
+            font-family: var(--font-main);
         }
 
         /* 背景画像の設定 */
         #bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            /* 画像ファイル*/
+            position: fixed; inset: 0;
             background-image: url('bg.png'); 
             background-size: cover;
             background-position: center;
@@ -29,12 +32,16 @@
 
         .overlay {
             height: 100vh;
-            background: rgba(0, 0, 0, 0.4); 
+            background: rgba(255, 230, 234, 0.7); 
+            backdrop-filter: blur(3px);
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            color: white;
+            justify-content: center; /* 中央寄せ */
+            color: var(--niko-brown);
+            /* 下にフッターがある分、少しだけ上にオフセット（底上げ） */
+            padding-bottom: 10vh; 
+            box-sizing: border-box;
         }
 
         /* 設定エリア */
@@ -43,52 +50,103 @@
             display: flex;
             gap: 10px;
             align-items: center;
+            background: var(--niko-cream);
+            padding: 15px 25px;
+            border-radius: 50px;
+            border: 3px solid var(--niko-pink);
+            box-shadow: 0 5px 0 var(--niko-pink);
         }
 
         input[type="number"] {
-            width: 80px;
-            padding: 10px;
-            font-size: 1.2rem;
-            border-radius: 10px;
-            border: none;
+            width: 70px;
+            padding: 8px;
+            font-size: 1.5rem;
+            border-radius: 15px;
+            border: 2px solid var(--niko-pink);
             text-align: center;
+            background: #fff;
+            color: var(--niko-brown);
+            font-family: var(--font-main);
         }
 
         /* タイマー表示 */
         #timer {
-            font-size: 10rem;
+            font-size: clamp(5rem, 20vw, 10rem); /* 画面幅に合わせて可変、かつ最大サイズを制限 */
             font-weight: bold;
-            margin: 20px 0;
-            text-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
+            margin: 10px 0;
+            color: var(--niko-pink);
+            text-shadow: 4px 4px 0px #fff, 6px 6px 0px var(--niko-brown);
+            letter-spacing: -2px;
+            line-height: 1; /* 余計な上下の隙間をカット */
+            }
 
-        /* ボタン */
-        button {
-            padding: 12px 30px;
+        /* アプリ内ボタン */
+        .controls { display: flex; gap: 20px; }
+        
+        .controls button, .setup-area button {
+            padding: 12px 35px;
             font-size: 1.2rem;
             cursor: pointer;
             border: none;
             border-radius: 30px;
-            background: white;
-            color: #333;
+            background: var(--niko-pink);
+            color: white;
             transition: 0.2s;
-            font-weight: bold;
+            font-family: var(--font-main);
+            box-shadow: 0 5px 0 var(--niko-brown);
         }
 
-        button:hover {
-            transform: scale(1.05);
-            background: #eee;
+        #setBtn {
+            padding: 8px 20px;
+            font-size: 1rem;
+            background: var(--niko-gold);
         }
 
-        button:disabled {
-            background: #888;
-            cursor: not-allowed;
+        .controls button:hover, .setup-area button:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.1);
         }
 
-        .controls {
+        .controls button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--niko-brown);
+        }
+
+        /* --- ナビゲーションフッター --- */
+        .system-footer {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             gap: 15px;
+            z-index: 1000;
         }
+
+        .btn-niko-nav {
+            background: var(--niko-pink);
+            border: 3px solid #fff;
+            color: #fff;
+            padding: 10px 25px;
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: none;
+            transition: 0.3s;
+            border-radius: 50px;
+            box-shadow: 0 5px 0 var(--niko-brown);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-niko-nav:hover {
+            background: var(--niko-cream);
+            color: var(--niko-pink);
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 var(--niko-brown);
+        }
+
+        body { padding-bottom: 80px; }
     </style>
 </head>
 <body>
@@ -98,8 +156,8 @@
     <div class="overlay">
         <div class="setup-area">
             <input type="number" id="minutesInput" value="3" min="1" max="999">
-            <span>分に設定</span>
-            <button id="setBtn">セット</button>
+            <span style="font-weight: bold; margin: 0 10px;">ぷん(分)</span>
+            <button id="setBtn">セット✨</button>
         </div>
 
         <div id="timer">03:00</div>
@@ -120,14 +178,12 @@
         const startStopBtn = document.getElementById('startStopBtn');
         const resetBtn = document.getElementById('resetBtn');
 
-        // 表示更新
         function updateDisplay() {
             const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
             const s = (timeLeft % 60).toString().padStart(2, '0');
             timerDisplay.textContent = `${m}:${s}`;
         }
 
-        // 時間をセット
         setBtn.addEventListener('click', () => {
             const mins = parseInt(minutesInput.value);
             if (mins > 0) {
@@ -137,7 +193,6 @@
             }
         });
 
-        // タイマー開始
         function startTimer() {
             if (timerId !== null) return;
             timerId = setInterval(() => {
@@ -147,19 +202,18 @@
                 } else {
                     clearInterval(timerId);
                     timerId = null;
-                    startStopBtn.textContent = 'スタート';
-                    alert('終了しました！');
+                    startStopBtn.textContent = 'まほう開始';
+                    alert('お時間だよ！笑顔で戻ってきてね🧸✨');
                 }
             }, 1000);
-            startStopBtn.textContent = 'ストップ';
+            startStopBtn.textContent = 'ちょっと休憩';
             setBtn.disabled = true;
         }
 
-        // タイマー停止
         function stopTimer() {
             clearInterval(timerId);
             timerId = null;
-            startStopBtn.textContent = 'スタート';
+            startStopBtn.textContent = 'まほう開始';
             setBtn.disabled = false;
         }
 
